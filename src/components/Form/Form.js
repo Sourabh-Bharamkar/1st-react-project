@@ -1,49 +1,58 @@
 import './Form.css'
-import React, { useState } from 'react';
+import React, {useRef } from 'react';
 
 
 const Form = (props) => {
 
-    const [enteredUsername, setEnteredUsername] = useState('')
-    const [enteredAge, setEnteredAge] = useState('')
+    // const [enteredUsername, setEnteredUsername] = useState('')
+    // const [enteredAge, setEnteredAge] = useState('')
+
+
+    //instead of using state for input elements which re-renders for each key stroke
+    // we can avoid these unnecessary re-renders by using refs to store references of dom elements and access its value;
+
+    const nameInputRef=useRef();
+    const ageInputRef=useRef();
 
     const formSubmitHandler = (e) => {
         e.preventDefault();
 
-        if (enteredUsername.trim().length === 0) {
+        const enteredName=nameInputRef.current.value;
+        const enteredInputAge=ageInputRef.current.value;
+        
+
+        if (enteredName.trim().length === 0) {
             props.onChangeModalVisibility(true, 'Please enter valid name and age (non empty values)')
             return;
         }
 
-        if (enteredAge < 0) {
+        console.log(enteredInputAge)
+
+        if (enteredInputAge <= 0) {
             props.onChangeModalVisibility(true, 'Please enter valid age (>0)')
-            setEnteredAge('')
-            setEnteredUsername('')
+            ageInputRef.current.value=''
             return;
         }
 
         const userDetails = {
             id: Math.random().toString(),
-            username: enteredUsername,
-            age: enteredAge
+            username: enteredName,
+            age: enteredInputAge
         }
 
         console.log(userDetails)
 
         props.onSubmit(userDetails)
 
-        setEnteredAge('')
-        setEnteredUsername('')
+        // setEnteredAge('')
+        // setEnteredUsername('')
+
+        nameInputRef.current.value='';
+        ageInputRef.current.value=''
+        //generally we should avoid manipulating dom like above but here it is okay as we are not adding new node or changing css etc...
 
     }
 
-    const usernameChangeHandler = (e) => {
-        setEnteredUsername(e.target.value)
-    }
-
-    const ageChangeHandler = (e) => {
-        setEnteredAge(e.target.value)
-    }
 
 
     return (
@@ -53,12 +62,12 @@ const Form = (props) => {
                 <div className='new-user__controls'>
                     <div className='new-user__control'>
                         <label> Username </label>
-                        <input type='text' value={enteredUsername} onChange={usernameChangeHandler} ></input>
+                        <input type='text' ref={nameInputRef} ></input>
                     </div>
 
                     <div className='new-user__control'>
                         <label> Age (Years) </label>
-                        <input type="number" value={enteredAge} onChange={ageChangeHandler}></input>
+                        <input type="number"  ref={ageInputRef} ></input>
                     </div>
                 </div>
 
